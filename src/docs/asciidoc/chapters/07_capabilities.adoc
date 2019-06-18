@@ -1,0 +1,63 @@
+[background-color="#01303a"]
+== Module capabilities
+
+=== Definition
+
+* Modules have coordinates
+* However they sometimes conflict, replace each other, ...
+
+What if there was something to express that?
+
+And your dependency management system could use that information?
+
+=== The famous logging problem
+
+[%step]
+* Slf4j and is bridging / replacement modules
+* `log4j` vs. `slf4j-log4j12` vs. `log4j-over-slf4j`
+* And similarly for `java.util.logging`
+* And again for `commons-logging`
+
+=== The renamed or variant of libraries
+
+[%step]
+* `asm:asm` now known as `org.ow2.asm:asm`
+* `junit:junit-dep` and `junit:junit`
+* `cglib:cglib-nodep` and `cglib:cglib`
+
+=== Enter capabilities
+
+* Expressed as a GAV - yes, versioned!
+* By default, all modules have a capability that matches their coordinates
+* It is illegal to have two modules providing the same capability in a dependency graph
+
+=== How to use them?
+
+```groovy
+dependencies {
+  components.withModule('org.slf4j:log4j-over-slf4j', Log4JOverSlf4JRule)
+}
+
+class Log4JOverSlf4JRule implements ComponentMetadataRule {
+  @Override
+  void execute(ComponentMetadataContext context) {
+    def details = context.details
+    def version = details.id.version
+    details.allVariants { variant ->
+      variant.withCapabilities { capabilities ->
+        capabilities.addCapability("org.apache.logging.log4j", "log4j", "1.2.18")
+        capabilities.addCapability("org.slf4j", "slf4j-log4j12", version)
+      }
+    }
+  }
+}
+```
+
+=== Limitations
+
+[%step]
+* Does not get triggered if there is no conflict
+* Currently only a detection mechanism
+* Unless the engine can _upgrade_ the version of the capability
+* Future work to ease expressing a preference
+** For this capability, my graph should use that module

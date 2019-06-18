@@ -1,0 +1,72 @@
+:revnumber: {project-version}
+:example-caption!:
+ifndef::imagesdir[:imagesdir: images]
+ifndef::sourcedir[:sourcedir: ../java]
+:navigation:
+:menu:
+:status:
+:title-slide-background-image: title.png
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+
+= : Practical dependency management with Gradle 5
+
+Louis Jacomet (@ljacomet) - Gradle Inc.
+
+== Who am I?
+
+[%notitle]
+=== Louis
+[source,groovy]
+----
+speaker {
+    name 'Louis Jacomet'
+    company 'Gradle Inc.'
+
+    previously 'Terracotta / Ehcache',
+              'Freelance consultant',
+
+    outputs Stream.of(bugs),
+
+    twitter '@ljacomet',
+    github 'ljacomet',
+
+    extraDescription '''Did not figure out fully
+                        how to stay out of management?!?'''
+}
+----
+
+include::chapters/about-gradle.adoc[]
+
+include::chapters/01_history.adoc[]
+
+include::chapters/02_dependency_refresh.adoc[]
+
+include::chapters/03_dependency_analysis.adoc[]
+
+include::chapters/04_bom_support.adoc[]
+
+include::chapters/05_alignment.adoc[]
+
+include::chapters/06_platforms.adoc[]
+
+include::chapters/07_capabilities.adoc[]
+
+include::chapters/08_locking_strategy.adoc[]
+
+[background-color="#01303a"]
+== Conclusion
+
+=== Discover and experiment
+
+[%step]
+* Gradle has a rich set of dependency management features
+** Capabilities, selection rules, ...
+* Using them all is not a goal,
+* But sometimes a necessity to accommodate the reality out there
+
+[%notitle]
+== Thank you
+
+image::thank-you.png[background, size=cover]

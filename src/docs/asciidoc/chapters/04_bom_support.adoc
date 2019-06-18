@@ -1,0 +1,58 @@
+[background-color="#01303a"]
+== Bill Of Materials support in Gradle
+
+=== What is a Maven BOM?
+
+* Defines versions (and more) for dependencies
+* Used for obtaining a consistent set of versions
+** For modules composing a library, that work better together at the same version
+** For heterogeneous modules that form an ecosystem
+* Allows to omit versions in the build file that imports it
+
+http://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-dependencies/2.1.6.RELEASE/spring-boot-dependencies-2.1.6.RELEASE.pom[Example]
+
+=== Importing a BOM in Gradle
+
+```groovy
+dependencies {
+    implementation(
+        platform(
+            'org.springframework.boot:spring-boot-dependencies:2.1.6.RELEASE'
+        )
+    )
+}
+```
+
+=== Particularities in Gradle
+
+* BOM dependency declarations are imported as _constraints_
+* BOMs are like regular dependencies, they can be visible by consumers
+* Gradle _always_ considers _all_ versions in a dependency graph
+** No shortest path wins
+
+This creates an important difference with application of BOMs in Maven:
+
+_In Gradle, the transitive dependency graph can still resolve a dependency with a different version than specified in the BOM._
+
+=== Enforced BOMs
+
+```groovy
+dependencies {
+    implementation(
+        enforcedPlatform(
+            'org.springframework.boot:spring-boot-dependencies:2.1.6.RELEASE'
+        )
+    )
+}
+```
+
+Will result in constraints that _force_ versions instead of participating in version conflict resolution.
+
+Use responsibly, as again, this can be visible to your consumers.
+
+=== Replacement of Spring dependency management plugin
+
+* For most use cases
+* Unsupported scenarios:
+** If you want to override properties defined in the BOM to have a different set of constraints
+** Local dependency declaration causing a downgrade

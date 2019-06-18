@@ -1,0 +1,36 @@
+[background-color="#01303a"]
+== Aligning a group of dependencies
+
+=== What is the problem?
+
+* A group of dependencies are designed to work together.
+** Think `jackson` or even the Spring framework
+* Through transitive dependency updates, modules end up having different versions
+
+So the goal would be to have the tools to make sure that _any_ upgrade of _any_ module would cause the whole set to upgrade its version.
+
+[background-color="#01303a"]
+=== Demo
+
+=== Virtual platforms for published libraries
+
+[%step]
+* Name a virtual platform module
+* Enhance library modules metadata to reference that platform
+* Each added module is also made part of the virtual platform
+** When `jackson-dataformat-yaml` says it belongs to the platform, all platform _versions_ now point to it as well
+* Alignment!
+
+=== Details, details
+
+[%step]
+* A virtual platform can only align to a version it sees in the graph
+* A virtual platform will _attempt_ alignment on all modules
+** I a module `X` does not exist in version `B`, lower known versions will be tried in decreasing order
+
+=== Can I leverage an existing BOM?
+
+[%step]
+* Yes, but:
+* You still need the `belongsTo`
+* Alignment will be according to the BOM definitions

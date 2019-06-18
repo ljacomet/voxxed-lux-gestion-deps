@@ -1,0 +1,79 @@
+[background-color="#01303a"]
+== Dependency handling in Gradle
+
+Need a refresh?
+
+=== Declaring dependencies
+
+* Repositories
+* Configurations
+* Dependencies
+
+=== Repositories
+
+* Enables automated fetching of remote dependencies
+* Gradle attaches importance to the source of a dependency, its origin repository.
+* Declaration order matters
+* And `mavenLocal()`?
+
+[.notes]
+--
+* Talk about download, caching
+* checksums and refresh
+--
+
+=== Repository content filtering
+
+New in Gradle 5.1:
+
+```groovy
+repositories {
+    maven {
+        url "https://repo.mycompany.com"
+        content {
+           includeGroupByRegex "com\\.mycompany.*"
+        }
+    }
+}
+```
+
+=== Configurations
+
+Three different kinds:
+[%step]
+* Bucket of dependencies
+** `canBeResolved=false, canBeConsumed=false`
+* Resolvable configurations
+** `canBeResolved=true, canBeConsumed=false`
+* Consumable configurations
+** `canBeResolved=false, canBeConsumed=true`
+
+=== Dependencies
+
+```groovy
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.26'
+}
+```
+
+You can also use rich version declarations:
+
+```groovy
+dependencies {
+   implementation("info.picocli:picocli") {
+       version {
+          strictly("[3.9, 4.0[")
+          prefer("3.9.5")
+          reject("3.9.3")
+       }
+   }
+}
+```
+
+=== Semantics and dependencies
+
+Gradle has a strong modelling of dependencies:
+
+* Semantic difference between compilation and runtime
+* Semantic difference between building a library and building _against_ a library
+* Ability for a module to produce more than one variant

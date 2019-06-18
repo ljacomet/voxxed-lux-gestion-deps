@@ -1,0 +1,76 @@
+[background-color="#01303a"]
+== Gradle Java platforms
+
+=== The `java-platform` plugin
+
+A special kind of project, that contains no code but only defines constraints, and optionally dependencies.
+
+Allows you to model different things:
+[%step]
+* Defines the versions of dependencies for your multi project build
+* Defines a set of dependencies that have been tested together and can be the base for others to develop on top
+* Defines the different modules that compose your published library
+
+=== Multi project platform example
+
+```groovy
+plugins {
+  `java-platform`
+}
+
+dependencies {
+    constraints {
+        api("commons-httpclient:commons-httpclient:3.1")
+        runtime("org.postgresql:postgresql:42.2.5")
+    }
+}
+```
+
+=== Recommendation platform example
+
+```groovy
+plugins {
+  `java-platform`
+}
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+  constraints {
+      runtime('org.postgresql:postgresql:42.2.6')
+  }
+  api(platform('org.springframework.boot:spring-boot-dependencies:2.1.5.RELEASE'))
+  api(platform('com.fasterxml.jackson:jackson-bom:2.8.9'))
+}
+```
+
+=== Alignment platform
+
+```groovy
+plugins {
+  `java-platform`
+}
+
+dependencies {
+    api(project(':common'))
+    api(project(':server'))
+    api(project(':client'))
+}
+```
+
+In addition each of the modules uses the platform.
+
+=== But ...
+
+* To leverage all of this, Maven or Ivy metadata formats are not enough
+* Gradle has now its own metadata format
+** Stable since Gradle 5.3
+** Turned on by default in (upcoming) Gradle 6.0
+
+Try it out with the following in your `settings.gradle`:
+
+```groovy
+enableFeaturePreview("GRADLE_METADATA")
+```

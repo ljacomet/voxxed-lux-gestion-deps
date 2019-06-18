@@ -1,0 +1,98 @@
+[background-color="#01303a"]
+== Dependency locking usage pattern
+
+=== The scenario
+
+[%step]
+* Organization with multiple repositories
+* Applications are built using internal libraries or frameworks
+* Keeping up to date with the internal releases is done:
+** Through `-SNAPSHOT` dependencies, with all the potential instability
+** Manually, with edits of versions following releases
+* Could it be better?
+
+=== Locking refresher
+
+* Usage of dynamic versions make builds non reproducible
+* Dependency locking freezes these dynamic versions, giving back reproducibility
+* Generates one file per locked configuration that contains the module GAV
+
+=== Enabling locking
+
+```groovy
+configurations {
+  compileClasspath {
+    resolutionStrategy.activateDependencyLocking()
+  }
+}
+```
+
+=== Generating locking state
+
+```shell
+$ ./gradlew compileJava --write-locks
+```
+
+* Through the task execution, a number of configurations are resolved
+* All the configurations that have locking activated _and_ are resolved will write their lock state
+
+=== Leveraging lock state
+
+```shell
+$ ./gradlew compileJava
+```
+
+* All resolved configurations that have existing lock state _and_ are resolved will load it and apply it
+* Build fails if dependencies have been added, removed or changed version
+
+=== Updating lock state
+
+```shell
+$ ./gradlew compileJava --update-locks my.company:*
+```
+
+* Lock state for matching modules is ignored
+* Remaining lock state is applied in a lenient way, to allow cascading updates
+** Updating `my.company:utils` may cause an update of `com.google.guava:guava`
+
+=== How does it help then?
+
+```groovy
+dependencies {
+  implementation 'my.company:utils:[1.0,2.0['
+}
+```
+
+* Instead of using `-SNAPSHOT` or fixed version, use ranges
+* Since your organisation controls the versioning, you should be able to rely on semantic versioning
+
+[background-color="#01303a"]
+=== Demo
+
+=== And publishing?
+
+[%step]
+* If the common components use a similar system, then publishing is an issue
+** By default, Gradle publishes the _declared_ versions
+** Declaring ranges makes _your consumers_ non reproducible
+* Leverage the publication of _resolved_ versions
+** `versionMapping` to the rescue
+
+=== `versionMapping` in detail
+
+```groovy
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}
+```

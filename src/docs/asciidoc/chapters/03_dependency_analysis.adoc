@@ -1,0 +1,97 @@
+[background-color="#01303a"]
+== Inspecting the dependency graph
+
+=== The build declaration
+
+Example from Netflix: https://github.com/Netflix/genie
+```groovy
+dependencies {
+    implementation(project(":genie-security"))
+    implementation(project(":genie-web"))
+    implementation(project(":genie-ui"))
+
+    testImplementation(project(":genie-test"))
+    testImplementation(project(":genie-test-web"))
+}
+```
+
+So which dependencies will be used then?
+
+For compilation? at runtime?
+
+[background-color="#01303a"]
+=== Demo
+
+[.notes]
+--
+* compileClasspath vs runtimeClasspath
+* Structure of the tree
+* Version information
+* Notations for omitted and constraints
+--
+
+=== `dependencies` reporting task
+
+`$ ./gradlew genie-app:dependencies --configuration compileClasspath`
+
+* Will resolve the configuration `compileClasspath`
+* Will list all dependencies it contains as a tree
+** First level dependencies at the root
+** then transitive dependencies
+
+[%notitle%]
+=== dependencies 2
+* Provides information about the versions
+** Requested version vs. resolved version
+* Cuts repeating parts - see the `(*)`
+* Indicates constraints - see the `(c)`
+
+=== `dependencyInsight` reporting task
+
+`$ ./gradlew genie-app:dependencyInsight --configuration compileClasspath --dependency jsr305`
+
+* Will give detailed information on a dependency
+* What was selected?
+* What participated in the selection?
+
+=== Help your future self!
+
+A number of APIs around dependencies have a `because(String)` method.
+
+Use it and its output will be part of the dependency insight report.
+
+```groovy
+dependencies {
+   implementation("info.picocli:picocli") {
+       version {
+          strictly("[3.9, 4.0[")
+          prefer("3.9.5")
+          reject("3.9.3")
+       }
+       because("Provides command-line argument parsing but not 3.9.3 that has a bug affecting our usage")
+   }
+}
+```
+
+=== Really do!
+
+```groovy
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.gradle") {
+            useVersion("1.4")
+            because("API breakage in higher versions")
+        }
+    }
+}
+```
+
+=== Even more options with plugins
+
+[%step]
+* https://plugins.gradle.org/plugin/nebula.lint[Gradle Lint Plugin]
+** Unused dependencies
+** Dependency version bump
+* https://plugins.gradle.org/plugin/com.github.ben-manes.versions[Gradle Versions Plugin]
+** Reports on dependency versions used compared to available ones in repositories
+* And more ...
