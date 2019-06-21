@@ -4,14 +4,14 @@ plugins {
 }
 
 group = "my.company"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     jcenter()
 }
 
 dependencies {
-    implementation("com.google.guava:guava:24.0-jre")
+    implementation("com.google.guava:guava:24.1-jre")
 
     testImplementation("junit:junit:4.12")
 }
