@@ -1,2 +1,2 @@
-rootProject.name = "presentation-template"
+rootProject.name = "voxxed-lux-gestion-deps"
 

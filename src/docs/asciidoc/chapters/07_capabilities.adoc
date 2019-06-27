@@ -3,7 +3,7 @@
 
 === Definition
 
-* Modules have coordinates
+* Modules have different coordinates
 * However they sometimes conflict, replace each other, ...
 
 What if there was something to express that?
